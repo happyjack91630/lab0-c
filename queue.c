@@ -219,7 +219,6 @@ bool q_delete_mid(struct list_head *head)
  */
 bool q_delete_dup(struct list_head *head)
 {
-    // https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/
     return false;
 }
 
@@ -229,6 +228,30 @@ bool q_delete_dup(struct list_head *head)
 void q_swap(struct list_head *head)
 {
     // https://leetcode.com/problems/swap-nodes-in-pairs/
+    if (head == NULL) {
+        return;
+    }
+    struct list_head *cur = head->next;
+    struct list_head *prev = head;
+    struct list_head *next = cur->next;
+    int n = 0;
+    while (cur->next != head && cur != head) {
+        cur->next = next->next;
+        cur->prev = next;
+        next->next = cur;
+        next->prev = prev;
+        prev->next = next;
+        // prev->prev =cur;
+        prev = cur;
+        cur = cur->next;
+        next = cur->next;
+        n++;
+    }
+    if (n % 2 == 0) {
+        head->prev = cur;
+    } else {
+        cur->prev = prev;
+    }
 }
 
 /*
@@ -252,7 +275,6 @@ void q_reverse(struct list_head *head)
         cur = cur->prev;
     } while (cur != head);
 }
-
 
 
 /*
