@@ -219,7 +219,45 @@ bool q_delete_mid(struct list_head *head)
  */
 bool q_delete_dup(struct list_head *head)
 {
-    return false;
+    if (head == NULL || list_empty(head)) {
+        return false;
+    }
+    struct list_head *cur = head->next;
+    element_t *cur_e;
+    bool flag = false;  // record is cur duplicate ?
+    while (cur->next != head) {
+        cur_e = list_entry(cur, element_t, list);
+        element_t *cur_next_e = list_entry(cur->next, element_t, list);
+
+        if (strcmp(cur_e->value, cur_next_e->value) == 0) {
+            struct list_head *cur_next_next = cur->next->next;
+            cur->next = cur_next_next;
+            cur_next_next->prev = cur;
+            free(cur_next_e->value);
+            free(cur_next_e);
+            flag =
+                true;  // cur_e->value == cur_next_e->value, so cur is duplicate
+        } else {
+            if (flag) {  // cur is duplicate so need to be delete
+                cur->next->prev = cur->prev;
+                cur->prev->next = cur->next;
+                cur = cur->next;
+                free(cur_e->value);
+                free(cur_e);
+            } else {
+                cur = cur->next;
+                flag = false;
+            }
+        }
+    }
+    if (flag) {  // queue only left one item(cur) and this item also duplicate
+        cur->next->prev = cur->prev;
+        cur->prev->next = cur->next;
+        // cur = cur->next;
+        free(cur_e->value);
+        free(cur_e);
+    }
+    return true;
 }
 
 /*
