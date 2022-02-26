@@ -124,7 +124,6 @@ element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
     if (sp) {
         memcpy(sp, remove_head->value, bufsize - 1);
         sp[bufsize - 1] = '\0';
-        printf("%zu", strlen(sp));
     }
     return remove_head;
 }
