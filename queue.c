@@ -195,8 +195,9 @@ bool q_delete_mid(struct list_head *head)
         slow_ptr = slow_ptr->next;
         fast_ptr = fast_ptr->next->next;
     } while (fast_ptr->next != head && fast_ptr != head);
-    element_t *mid_node = list_entry(slow_ptr, element_t, list);
-    list_del(&mid_node->list);
+    element_t *mid_node =
+        list_entry(slow_ptr, element_t, list);  // slow_ptr will be the middle
+    list_del(slow_ptr);
     free(mid_node->value);
     free(mid_node);
     return true;
@@ -232,7 +233,21 @@ void q_swap(struct list_head *head)
  * (e.g., by calling q_insert_head, q_insert_tail, or q_remove_head).
  * It should rearrange the existing ones.
  */
-void q_reverse(struct list_head *head) {}
+void q_reverse(struct list_head *head)
+{
+    if (head == NULL || list_empty(head)) {
+        return;
+    }
+    struct list_head *cur = head;
+    struct list_head *tmp;
+    do {
+        tmp = cur->prev;
+        cur->prev = cur->next;
+        cur->next = tmp;
+        cur = cur->prev;
+    } while (cur != head);
+}
+
 
 /*
  * Sort elements of queue in ascending order
