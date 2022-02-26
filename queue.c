@@ -146,7 +146,6 @@ element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
     if (sp) {
         memcpy(sp, remove_tail->value, bufsize - 1);
         sp[bufsize - 1] = '\0';
-        printf("%zu", strlen(sp));
     }
     return remove_tail;
 }
