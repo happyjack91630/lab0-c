@@ -112,7 +112,19 @@ bool q_insert_tail(struct list_head *head, char *s)
  */
 element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
 {
-    return NULL;
+    if (head == NULL || list_empty(head)) {
+        return NULL;
+    }
+
+    element_t *remove_head = list_first_entry(head, element_t, list);
+    if (remove_head == NULL) {
+        return NULL;
+    }
+    list_del(&remove_head->list);
+    if (sp) {
+        memcpy(sp, remove_head->value, bufsize);
+    }
+    return remove_head;
 }
 
 /*
@@ -121,7 +133,19 @@ element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
  */
 element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
 {
-    return NULL;
+    if (head == NULL || list_empty(head)) {
+        return NULL;
+    }
+
+    element_t *remove_tail = list_last_entry(head, element_t, list);
+    if (remove_tail == NULL) {
+        return NULL;
+    }
+    list_del(&remove_tail->list);
+    if (sp) {
+        memcpy(sp, remove_tail->value, bufsize);
+    }
+    return remove_tail;
 }
 
 /*
@@ -140,8 +164,15 @@ void q_release_element(element_t *e)
  */
 int q_size(struct list_head *head)
 {
-
-    return 0;
+    if (head == NULL) {
+        return 0;
+    }
+    int length = 0;
+    struct list_head *node;
+    list_for_each (node, head) {
+        length++;
+    }
+    return length;
 }
 
 /*
