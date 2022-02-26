@@ -122,7 +122,9 @@ element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
     }
     list_del(&remove_head->list);
     if (sp) {
-        memcpy(sp, remove_head->value, bufsize);
+        memcpy(sp, remove_head->value, bufsize - 1);
+        sp[bufsize - 1] = '\0';
+        printf("%zu", strlen(sp));
     }
     return remove_head;
 }
@@ -143,7 +145,9 @@ element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
     }
     list_del(&remove_tail->list);
     if (sp) {
-        memcpy(sp, remove_tail->value, bufsize);
+        memcpy(sp, remove_tail->value, bufsize - 1);
+        sp[bufsize - 1] = '\0';
+        printf("%zu", strlen(sp));
     }
     return remove_tail;
 }
@@ -215,7 +219,7 @@ bool q_delete_mid(struct list_head *head)
 bool q_delete_dup(struct list_head *head)
 {
     // https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/
-    return true;
+    return false;
 }
 
 /*
@@ -247,6 +251,7 @@ void q_reverse(struct list_head *head)
         cur = cur->prev;
     } while (cur != head);
 }
+
 
 
 /*
