@@ -31,9 +31,8 @@
  * OK as long as head field of queue_t structure is in first position in
  * solution code
  */
-#include "queue.h"
-
 #include "console.h"
+#include "queue.h"
 #include "report.h"
 
 /* Settable parameters */
@@ -75,6 +74,59 @@ static const char charset[] = "abcdefghijklmnopqrstuvwxyz";
 
 /* Forward declarations */
 static bool show_queue(int vlevel);
+
+void q_shuffle(struct list_head *head)
+{
+    if (head == NULL || list_empty(head)) {
+        return;
+    }
+
+    int q_length = q_size(head);
+
+    if (q_length == 1) {
+        return;
+    }
+
+    struct list_head *cur;
+    for (cur = head->next; cur->next != head; cur = cur->next) {
+        int target;
+        do {
+            target = rand() % q_length;
+        } while (target == 0);  // prevent target = cur
+        struct list_head *target_list = cur;
+        for (int i = 0; i < target; i++) {
+            target_list = target_list->next;
+        }
+        element_t *cur_e = list_entry(cur, element_t, list);
+        element_t *target_list_e = list_entry(target_list, element_t, list);
+
+        char *tmp = cur_e->value;
+        cur_e->value = target_list_e->value;
+        target_list_e->value = tmp;
+        q_length--;
+    }
+}
+
+static bool do_shuffle(int argc, char *argv[])
+{
+    if (argc != 1) {
+        report(1, "%s takes no arguments", argv[0]);
+        return false;
+    }
+
+    if (!l_meta.l)
+        report(3, "Warning: Calling reverse on null queue");
+    error_check();
+
+    set_noallocate_mode(true);
+    if (exception_setup(true))
+        q_shuffle(l_meta.l);
+    exception_cancel();
+
+    set_noallocate_mode(false);
+    show_queue(3);
+    return !error_check();
+}
 
 static bool do_free(int argc, char *argv[])
 {
@@ -895,6 +947,7 @@ static void console_init()
         dedup, "                | Delete all nodes that have duplicate string");
     ADD_COMMAND(swap,
                 "                | Swap every two adjacent nodes in queue");
+    ADD_COMMAND(shuffle, "                | shuffle by Fisher-Yates shuffle");
     add_param("length", &string_length, "Maximum length of displayed string",
               NULL);
     add_param("malloc", &fail_probability, "Malloc failure probability percent",
