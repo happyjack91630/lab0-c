@@ -273,9 +273,11 @@ void q_swap(struct list_head *head)
     struct list_head *cur = head->next;
     struct list_head *prev = head;
     struct list_head *next = cur->next;
-    int n = 0;
     while (cur->next != head && cur != head) {
         cur->next = next->next;
+
+        next->next->prev = cur;
+
         cur->prev = next;
         next->next = cur;
         next->prev = prev;
@@ -284,12 +286,6 @@ void q_swap(struct list_head *head)
         prev = cur;
         cur = cur->next;
         next = cur->next;
-        n++;
-    }
-    if (n % 2 == 0) {
-        head->prev = cur;
-    } else {
-        cur->prev = prev;
     }
 }
 
