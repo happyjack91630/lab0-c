@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <stdint.h>
 #include "harness.h"
 #include "queue.h"
 
@@ -315,9 +316,58 @@ void q_reverse(struct list_head *head)
 }
 
 
+struct list_head *mergeTwoLists(struct list_head *L1, struct list_head *L2)
+{
+    struct list_head *head = NULL, **ptr = &head, **cur;
+    for (cur = NULL; L1 && L2; *cur = (*cur)->next) {
+        // compare accending pair by pair
+        element_t *node1 = container_of(L1, element_t, list);
+        element_t *node2 = container_of(L2, element_t, list);
+        cur = (strcmp(node1->value, node2->value) <= 0) ? &L1 : &L2;
+        *ptr = *cur;
+        ptr = &(*ptr)->next;
+    }
+    *ptr = (struct list_head *) ((uintptr_t) L1 | (uintptr_t) L2);
+    return head;
+}
+
+
+static struct list_head *mergesort_list(struct list_head *head)
+{
+    if (!head || !head->next) {
+        return head;
+    }
+    struct list_head *slow = head;
+    for (struct list_head *fast = head->next; fast && fast->next;
+         fast = fast->next->next) {
+        slow = slow->next;
+    }
+    struct list_head *mid = slow->next;
+    slow->next = NULL;
+    struct list_head *left = mergesort_list(head);
+    struct list_head *right = mergesort_list(mid);
+
+    return mergeTwoLists(left, right);
+}
 /*
  * Sort elements of queue in ascending order
  * No effect if q is NULL or empty. In addition, if q has only one
  * element, do nothing.
  */
-void q_sort(struct list_head *head) {}
+void q_sort(struct list_head *head)
+{
+    if (head == NULL || list_empty(head)) {
+        return;
+    }
+    head->prev->next = NULL;  // circular to non-circular
+    head->next = mergesort_list(head->next);
+
+
+    struct list_head *ptr = head;
+    while (ptr->next) {  // reconstruct circular link list (prev)
+        ptr->next->prev = ptr;
+        ptr = ptr->next;
+    }
+    ptr->next = head;
+    head->prev = ptr;
+}
